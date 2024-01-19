@@ -24,7 +24,11 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 //    implementation(libs.annotations)
-    api("app.pieces.pieces-os-client:pieces-os-client:1.0.0") // 1.2.2
+    implementation("com.squareup.moshi:moshi-kotlin:1.9.2")
+    implementation("com.squareup.moshi:moshi-adapters:1.9.2")
+    implementation("com.squareup.okhttp3:okhttp:4.2.2")
+    api("app.pieces.pieces-os-client:pieces-os-client:1.2.2") // 1.2.2
+//    implementation(files("../research/pieces-os-client-sdk-for-kotlin/build/libs/pieces-os-client-1.2.2.jar"))
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

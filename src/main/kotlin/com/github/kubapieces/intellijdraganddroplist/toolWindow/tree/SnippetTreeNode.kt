@@ -1,6 +1,5 @@
 package com.github.kubapieces.intellijdraganddroplist.toolWindow.tree
 
-import app.pieces.sdk.models.MinimalAssetDescriptor
 import javax.swing.tree.DefaultMutableTreeNode
 
 class SnippetTreeNode(descriptor: MinimalAssetDescriptor) : DefaultMutableTreeNode(descriptor) {

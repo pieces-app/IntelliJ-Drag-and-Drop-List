@@ -1,18 +1,15 @@
 package com.github.kubapieces.intellijdraganddroplist.toolWindow.tree
 
-import app.pieces.plugins.jetbrains.actions.SaveProcessor
-import app.pieces.plugins.jetbrains.actions.listview.ReclassifyAction
-import app.pieces.plugins.jetbrains.ex.stringRepresentation
-import app.pieces.plugins.jetbrains.services.assets.GlobalStorage
-import app.pieces.plugins.jetbrains.services.reporters.Analytics
-import app.pieces.plugins.jetbrains.ui.components.SnippetTreeNode
-import app.pieces.plugins.jetbrains.util.LangToExt
-import app.pieces.sdk.models.Asset
-import app.pieces.sdk.models.ClassificationSpecificEnum
-import app.pieces.sdk.models.UIElements
+import com.github.kubapieces.intellijdraganddroplist.sdkutil.stringRepresentationOrNull
+import com.github.kubapieces.intellijdraganddroplist.services.ApiAccumulator
+import com.github.kubapieces.intellijdraganddroplist.services.SaveProcessor
+import com.github.kubapieces.intellijdraganddroplist.services.SnippetStore
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import org.piecesapp.client.models.Asset
+import org.piecesapp.client.models.AssetReclassification
+import org.piecesapp.client.models.ClassificationSpecificEnum
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
@@ -55,7 +52,7 @@ internal class TreeTransferHandler(private val project: Project) : TransferHandl
         val node = tree.selectionPath?.lastPathComponent ?: return null
         if (node !is SnippetTreeNode) return null
         val assetId = node.id
-        val asset = service<GlobalStorage>().lightSnippet(assetId)
+        val asset = service<SnippetStore>()[assetId]
         return SnippetNodesTransferable(asset)
     }
 
@@ -68,8 +65,15 @@ internal class TreeTransferHandler(private val project: Project) : TransferHandl
         val isAsset = support.isDataFlavorSupported(SnippetNodesTransferable.ASSET_FLAVOR)
         if (isAsset) {
             val ext = getTargetType(support.dropLocation as JTree.DropLocation) ?: return false
-            Analytics.interact("asset_reclassified_via_dragndrop", UIElements.pieces_list)
-            ReclassifyAction.doReclassify(support.transferable.getTransferData(SnippetNodesTransferable.ASSET_FLAVOR) as Asset, ext, project)
+            service<ApiAccumulator>().doAsync {
+                asset.assetReclassify(
+                    false,
+                    AssetReclassification(
+                        ext,
+                        support.transferable.getTransferData(SnippetNodesTransferable.ASSET_FLAVOR) as Asset
+                    )
+                )
+            }
             return true
         }
 
@@ -104,7 +108,6 @@ internal class TreeTransferHandler(private val project: Project) : TransferHandl
         val text = source.transferable.getTransferData(DataFlavor.stringFlavor) as String
         val ext = getTargetType(source.dropLocation as JTree.DropLocation)
         val seed = SaveProcessor.buildSeed(project, editor, file, text, ext)
-        Analytics.interact("asset_created_by_dragging_code_onto_${if (ext == null) "list" else "specific_type"}", UIElements.pieces_list)
         SaveProcessor.save(seed)
     }
 
@@ -112,19 +115,18 @@ internal class TreeTransferHandler(private val project: Project) : TransferHandl
         var destination = dl.path.lastPathComponent as DefaultMutableTreeNode
         if (destination is SnippetTreeNode)
             destination = dl.path.parentPath.lastPathComponent as DefaultMutableTreeNode
-        return LangToExt.getValue(destination.userObject as String)
+        return destination.userObject as? ClassificationSpecificEnum
     }
 
 }
 
 class SnippetNodesTransferable(private val asset: Asset? = null, givenText: String? = null) : Transferable {
-    private val text = givenText ?: asset?.stringRepresentation()?.ifBlank { null }
+    private val text = givenText ?: asset?.stringRepresentationOrNull()
 
     @Throws(UnsupportedFlavorException::class)
     override fun getTransferData(flavor: DataFlavor): Any {
         if (!isDataFlavorSupported(flavor)) throw UnsupportedFlavorException(flavor)
         if (flavor == ASSET_FLAVOR) return asset!!
-        Analytics.interact("asset_dragndropped_into_text_destination", UIElements.pieces_list)
         return text!!
     }
 
