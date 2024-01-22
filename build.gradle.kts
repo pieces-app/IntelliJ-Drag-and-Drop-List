@@ -26,7 +26,7 @@ dependencies {
 //    implementation(libs.annotations)
     implementation("com.squareup.moshi:moshi-kotlin:1.9.2")
     implementation("com.squareup.moshi:moshi-adapters:1.9.2")
-    implementation("com.squareup.okhttp3:okhttp:4.2.2")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     api("app.pieces.pieces-os-client:pieces-os-client:1.2.2") // 1.2.2
 //    implementation(files("../research/pieces-os-client-sdk-for-kotlin/build/libs/pieces-os-client-1.2.2.jar"))
 }
