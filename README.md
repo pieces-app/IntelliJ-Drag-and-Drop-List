@@ -17,11 +17,20 @@
 - [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
 
 <!-- Plugin description -->
+# Pieces Drag and Drop for IntelliJ
 This simple IntelliJ Platform plugin connects to your instance of Pieces OS and displays a simple list of your saved Snippets.
 The list is also a great demo of drag and drop support,
 as it allows you to simply import your Snippet of choice to your code by dragging it into the editor,
 as well as quickly save a new piece of code to Pieces by selecting and dragging it onto the list
 <!-- Plugin description end -->
+
+# Getting started
+This plugin requires Pieces OS to work properly. You can get it [here](https://docs.pieces.app/installation-getting-started/what-am-i-installing).
+
+Once you have Pieces OS installed, to build and run the plugin, all you have to do is use the `Run Plugin` run configuration included in this project.
+You can also use your terminal with `./gradlew runIde` command, if you want.
+
+Now go and have fun playing around with this project!
 
 ## Installation
 
