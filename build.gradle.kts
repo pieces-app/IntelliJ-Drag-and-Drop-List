@@ -24,7 +24,7 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 //    implementation(libs.annotations)
-    implementation("com.squareup.moshi:moshi-kotlin:1.9.2")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
     implementation("com.squareup.moshi:moshi-adapters:1.9.2")
     implementation("com.squareup.okhttp3:okhttp:4.2.2")
     api("app.pieces.pieces-os-client:pieces-os-client:1.2.2") // 1.2.2
