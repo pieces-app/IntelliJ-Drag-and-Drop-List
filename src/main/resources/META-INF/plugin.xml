@@ -1,18 +1,20 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.kubapieces.intellijdraganddroplist</id>
-    <name>IntelliJ-Drag-and-Drop-List Template</name>
+    <id>org.piecesapp.intellij.draganddroplist</id>
+    <name>IDEA-Drag-and-Drop-List Template</name>
     <vendor>kuba-pieces</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
-
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.kubapieces.intellijdraganddroplist.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <!--This let's the IDE know we are going to enable a custom tool window-->
+        <toolWindow factoryClass="org.piecesapp.intellij.draganddroplist.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
     </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.kubapieces.intellijdraganddroplist.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+    <actions>
+        <!--Any action we may want to use in our plugin should be registered here-->
+        <action class="org.piecesapp.intellij.draganddroplist.actions.RefreshMySavedPiecesAction"
+                icon="AllIcons.Actions.Refresh"
+                text="Refresh Saved Pieces"
+                id="DnD.RefreshSnippets" />
+    </actions>
 </idea-plugin>

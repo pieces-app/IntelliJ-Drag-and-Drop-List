@@ -1,7 +1,7 @@
-package com.github.kubapieces.intellijdraganddroplist.services
+package org.piecesapp.intellij.draganddroplist.services
 
 
-import com.github.kubapieces.intellijdraganddroplist.sdkutil.safeValue
+import org.piecesapp.intellij.draganddroplist.sdkutil.safeValue
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -10,6 +10,18 @@ import com.intellij.util.Range
 import org.piecesapp.client.models.*
 
 object SaveProcessor {
+    /**
+     * This function saves a new asset from data processed from an in-IDE event.
+     * It first connects to the server using ApiAccumulator service, then creates a new asset using the provided seed.
+     * The new asset is created with a SeededFormat, which includes a SeededFragment and a SeededClassification.
+     * The SeededFragment is created with a TransferableString from the seed's text and a FragmentMetadata from the seed's extension.
+     * The SeededClassification is determined based on the seed's extension. If the extension is 'text' or 'txt', the classification is set to 'TEXT', otherwise it is set to 'CODE'.
+     * The new asset also includes a SeededAssetMetadata, which is set with the seed's name and a manual mechanism.
+     * Finally, the new asset is stored in the SnippetStore service.
+     *
+     * @param seed The EventDerivedAssetSeed used to create the new asset.
+     * @see EventDerivedAssetSeed
+     */
     fun save(seed: EventDerivedAssetSeed) =
         service<ApiAccumulator>().doAsync {
             connect()
@@ -42,9 +54,14 @@ object SaveProcessor {
         else
             "lines $start-$end"
 
-    /// this is going to get the range of lines
-    /// if cursor, then from start to end of selected text
-    /// if just file then 0 to the end of the file ~ Mark
+    /**
+     * This function computes the line range from provided editor reference.
+     * If no selection is made, the range will be the entire file's line count
+     *
+     * @param editor The Editor instance for which the line range is to be calculated.
+     *
+     * @return A string representing the line range of the editor. If the editor is null, an empty string is returned.
+     */
     private fun lineRange(editor: Editor?): String {
         if (editor == null) return ""
         val rawRange = rawLineRange(editor)
@@ -60,6 +77,17 @@ object SaveProcessor {
     }
 
 
+    /**
+     * This function builds an EventDerivedAssetSeed object from the provided parameters.
+     *
+     * @param project The Project object, can be null. If null, the project name will be set as "Unknown".
+     * @param editor The Editor object, can be null. Used to determine the selection's line range.
+     * @param file The VirtualFile object. Its name and presentable URL are used in the EventDerivedAssetSeed object.
+     * @param text The text to be included in the EventDerivedAssetSeed object.
+     * @param ext The ClassificationSpecificEnum object, can be null. If null, the extension will be determined from the file's extension.
+     *
+     * @return An EventDerivedAssetSeed object built from the provided parameters.
+     */
     fun buildSeed(project: Project?, editor: Editor?, file: VirtualFile, text: String, ext: ClassificationSpecificEnum? = null): EventDerivedAssetSeed {
         val name = file.name
         val projectName: String = project?.name ?: "Unknown"
